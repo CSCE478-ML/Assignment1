@@ -3,8 +3,11 @@ import pandas as pd
 
 def compute_confusion_matrix(actual, predicted):
     
-    pd_actual = pd.Series(actual, name='Actual')
-    pd_predicted = pd.Series(predicted, name='Predicted')
+    arary_actual = np.array(actual)
+    array_pred = np.array(predicted)
+    
+    pd_actual = pd.Series(arary_actual, name='Actual')
+    pd_predicted = pd.Series(array_pred, name='Predicted')
 
     CM =  pd.crosstab(pd_actual, pd_predicted)
     return CM
@@ -20,8 +23,11 @@ def compute_F1_score(actual, predicted):
 
 def compute_precision(actual, predicted):
     
-    pd_actual = pd.Series(actual, name='Actual')
-    pd_predicted = pd.Series(predicted, name='Predicted')
+    arary_actual = np.array(actual)
+    array_pred = np.array(predicted)
+    
+    pd_actual = pd.Series(arary_actual, name='Actual')
+    pd_predicted = pd.Series(array_pred, name='Predicted')
     
     CM =  pd.crosstab(pd_actual, pd_predicted).to_numpy()   # CM is converted into a 2 X 2 array.
     
@@ -33,8 +39,11 @@ def compute_precision(actual, predicted):
 
 def compute_recall(actual, predicted):
     
-    pd_actual = pd.Series(actual, name='Actual')
-    pd_predicted = pd.Series(predicted, name='Predicted')
+    arary_actual = np.array(actual)
+    array_pred = np.array(predicted)
+    
+    pd_actual = pd.Series(arary_actual, name='Actual')
+    pd_predicted = pd.Series(array_pred, name='Predicted')
     
     CM =  pd.crosstab(pd_actual, pd_predicted).to_numpy()   # CM is converted into a 2 X 2 array.
     
