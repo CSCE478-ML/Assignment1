@@ -18,7 +18,7 @@ def l1_norm(x,y):
 def accuracy(x,y):
     x,y = np.array(x),np.array(y)
     pred = (x == y).astype(np.int)
-    return pred.mean()*100
+    return pred.mean()
 
 def gen_error(x,y):
     return 1 - accuracy(x,y)
@@ -160,7 +160,6 @@ def plotting_roc_curve(fpr, tpr, label = None):
 # Input arguments are y_label, y_prob, and target_label.
 # Target_label should be either 0 or 1 in our scenario. The defalt value is 1 in this function. 
 # It is similar to the function used to generate tprs and fprs above. 
-
 def generate_precision_recall_curve_elements(y_label, y_prob, target_label = 1):
     
     # gets the target label.
@@ -232,6 +231,13 @@ def plotting_precision_recall_curves(precisions, recalls, thresholds):
     
     plt.show()
 
+def calculate_auc(fpr_x_axis, tpr_y_axis):
+    
+    # Trapezoidal numerical integration 
+    auc = np.trapz(tpr_y_axis, fpr_x_axis)
+    
+    return auc    
+    
 
 
 #A9: KNN_Classifier model
@@ -246,9 +252,11 @@ class knnClassifier(): # Change to KNN_classifier, even at testing
         self.k = n_neighbours
         self.weights = weights
         self.distance = kwargs.get('distance','Euclidean')
+        self.prob = []
     
     def predict(self,X):
         pred = []
+        self.prob = []
         for i in range(X.shape[0]):
             np.seterr(divide='ignore')  ## just ignoring warning if value is too small as it results devide by 0
             if(self.weights == 'uniform' and self.distance == 'Manhattan'):
@@ -263,12 +271,18 @@ class knnClassifier(): # Change to KNN_classifier, even at testing
             labels = list( map(lambda i : self.Y[i], indx_opt)) 
             labels = np.array(labels)
             guess =  (labels == 1).astype(np.int).mean()
-            if(guess >= 0.5):
+            self.prob.append(guess)
+            if(guess > 0.5):
                 pred.append(1.)  ## float or int
             else:
                 pred.append(0.)
         pred = np.array(pred)
-        return np.reshape(pred,(X.shape[0],1))
+        #return np.reshape(pred,(X.shape[0],1))
+        return pred
+    
+    def getProb(self,X):
+        self.predict(X)
+        return self.prob
 
 #############################################################################
 
@@ -284,7 +298,7 @@ def sFold(folds,data,labels,model,error_fuction,**model_args):
     true_y = []
     for idx,val in enumerate(s_part):
         test_y = val[:,-1]
-        test_y = np.expand_dims(test_y, axis=1)
+        #test_y = np.expand_dims(test_y, axis=1)
         test = val[:,:-1]
         train = np.concatenate(np.delete(s_part,idx,0))
         label = train[:,-1]
@@ -295,6 +309,7 @@ def sFold(folds,data,labels,model,error_fuction,**model_args):
         true_y.append(test_y)
     pred_y = np.concatenate(pred_y)
     true_y = np.concatenate(true_y)
+
     avg_error = error_fuction(pred_y,true_y).mean()   
     result = {'Expected labels':true_y, 'Predicted labels': pred_y,'Average error':avg_error }
     return result
